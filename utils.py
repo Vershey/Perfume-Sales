@@ -7,8 +7,8 @@ import os
 
 import chromadb
 import fitz  # PyMuPDF
+from chromadb.utils.embedding_functions import DefaultEmbeddingFunction
 from PIL import Image
-from sentence_transformers import SentenceTransformer
 
 import config
 
@@ -18,17 +18,16 @@ import config
 _embedder = None
 
 
-def get_embedder() -> SentenceTransformer:
+def get_embedder():
     global _embedder
     if _embedder is None:
-        _embedder = SentenceTransformer(config.EMBED_MODEL)
+        _embedder = DefaultEmbeddingFunction()
     return _embedder
 
 
 def embed(texts: list[str]) -> list[list[float]]:
     """Return embeddings for a list of strings."""
-    vecs = get_embedder().encode(texts, normalize_embeddings=True)
-    return [v.tolist() for v in vecs]
+    return list(get_embedder()(texts))
 
 
 # ---------------------------------------------------------------------------
